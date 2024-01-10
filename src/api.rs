@@ -166,7 +166,7 @@ fn paginate(uri: &Uri, items: &[Country]) -> Paginated {
     };
     let page_items = items
         .iter()
-        .skip((page-1) * ITEMS_PER_PAGE)
+        .skip((page - 1) * ITEMS_PER_PAGE)
         .take(ITEMS_PER_PAGE)
         .map(|country| country.clone())
         .collect();
@@ -182,13 +182,26 @@ pub async fn all(request: Request) -> Json<Paginated> {
     Json(paginate(request.uri(), &*COUNTRIES))
 }
 
-pub async fn name(Path(name): Path<String>) -> (StatusCode, Json<Vec<Country>>) {
+pub async fn by_cca3(Path(cca3): Path<String>) -> Result<Json<Country>, StatusCode> {
+    let country = COUNTRIES
+        .iter()
+        .filter(|country| country.cca3 == cca3)
+        .next();
+
+    if let Some(country) = country {
+        Ok(Json(country.clone()))
+    } else {
+        Err(StatusCode::NOT_FOUND)
+    }
+}
+
+pub async fn name(Path(name): Path<String>) -> Result<Json<Vec<Country>>, StatusCode> {
     let pattern = match RegexBuilder::new(&name).case_insensitive(true).build() {
         Ok(pattern) => pattern,
         Err(e) => {
             log::info!("User request produced: {:?}", e);
             // TODO: send the error message to the user
-            return (StatusCode::BAD_REQUEST, Json(Vec::new()));
+            return Err(StatusCode::BAD_REQUEST);
         }
     };
     let result = COUNTRIES
@@ -198,16 +211,16 @@ pub async fn name(Path(name): Path<String>) -> (StatusCode, Json<Vec<Country>>) 
         })
         .map(|coutry| coutry.clone())
         .collect();
-    (StatusCode::OK, Json(result))
+    Ok(Json(result))
 }
 
-pub async fn capital(Path(name): Path<String>) -> (StatusCode, Json<Vec<Country>>) {
+pub async fn capital(Path(name): Path<String>) -> Result<Json<Vec<Country>>, StatusCode> {
     let pattern = match RegexBuilder::new(&name).case_insensitive(true).build() {
         Ok(pattern) => pattern,
         Err(e) => {
             log::info!("User request produced: {:?}", e);
             // TODO: send the error message to the user
-            return (StatusCode::BAD_REQUEST, Json(Vec::new()));
+            return Err(StatusCode::BAD_REQUEST);
         }
     };
     let result = COUNTRIES
@@ -220,7 +233,7 @@ pub async fn capital(Path(name): Path<String>) -> (StatusCode, Json<Vec<Country>
         })
         .map(|coutry| coutry.clone())
         .collect();
-    (StatusCode::OK, Json(result))
+    Ok(Json(result))
 }
 
 pub async fn language(Path(language): Path<String>) -> Json<Vec<Country>> {
@@ -238,13 +251,13 @@ pub async fn language(Path(language): Path<String>) -> Json<Vec<Country>> {
     Json(result)
 }
 
-pub async fn currency(Path(currency): Path<String>) -> (StatusCode, Json<Vec<Country>>) {
+pub async fn currency(Path(currency): Path<String>) -> Result<Json<Vec<Country>>, StatusCode> {
     let pattern = match RegexBuilder::new(&currency).case_insensitive(true).build() {
         Ok(pattern) => pattern,
         Err(e) => {
             log::info!("User request produced: {:?}", e);
             // TODO: send the error message to the user
-            return (StatusCode::BAD_REQUEST, Json(Vec::new()));
+            return Err(StatusCode::BAD_REQUEST);
         }
     };
     let result = COUNTRIES
@@ -256,7 +269,7 @@ pub async fn currency(Path(currency): Path<String>) -> (StatusCode, Json<Vec<Cou
         })
         .map(|coutry| coutry.clone())
         .collect();
-    (StatusCode::OK, Json(result))
+    Ok(Json(result))
 }
 
 pub async fn callingcode(Path(calling_code): Path<String>) -> Json<Vec<Country>> {

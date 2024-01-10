@@ -10,7 +10,10 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let app = Router::new()
-        .route("/api/all", get(api::all))
+        .route("/api/countries", get(api::all))
+        .route("/api/countries/:cca3", get(api::by_cca3))
+
+
         .route("/api/name/:name", get(api::name))
         .route("/api/capital/:name", get(api::capital))
         .route("/api/language/:language", get(api::language))
