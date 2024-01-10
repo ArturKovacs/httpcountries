@@ -4,6 +4,7 @@ use axum::{
 };
 
 mod api;
+mod data;
 
 #[tokio::main]
 async fn main() {
