@@ -20,7 +20,8 @@ pub struct NativeName {
 pub struct Name {
     pub common: String,
     pub official: String,
-    pub nativeName: HashMap<String, NativeName>,
+    #[serde(rename = "nativeName")]
+    pub native_name: HashMap<String, NativeName>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -63,11 +64,13 @@ pub struct Country {
     pub cioc: String,
     pub independent: Option<bool>,
     pub status: String,
-    pub unMember: bool,
+    #[serde(rename = "unMember")]
+    pub un_member: bool,
     pub currencies: HashMap<String, Currency>,
     pub idd: Idd,
     pub capital: Vec<String>,
-    pub altSpellings: Vec<String>,
+    #[serde(rename = "altSpellings")]
+    pub alt_spellings: Vec<String>,
     pub region: String,
     pub subregion: String,
     pub languages: HashMap<String, String>,
@@ -87,10 +90,14 @@ pub struct Country {
     pub continents: Vec<String>,
 
     pub flags: Flag,
-    pub coatOfArms: Flag,
-    pub startOfWeek: String,
-    pub capitalInfo: CapitalInformation,
-    pub postalCode: HashMap<String, Option<String>>,
+    #[serde(rename = "coatOfArms")]
+    pub coat_of_arms: Flag,
+    #[serde(rename = "startOfWeek")]
+    pub start_of_week: String,
+    #[serde(rename = "capitalInfo")]
+    pub capital_info: CapitalInformation,
+    #[serde(rename = "postalCode")]
+    pub postal_code: HashMap<String, Option<String>>,
 }
 
 pub async fn all() -> Json<Vec<Country>> {
